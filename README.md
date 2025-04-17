@@ -16,6 +16,16 @@ This project builds a distributed PostgreSQL cluster with:
 
 ```
 /
+├── benchmark/                 # Performance benchmark tools
+│   ├── locust_benchmark.py             # Locust benchmark script
+│   ├── read_benchmark.sh               # Read operation benchmark
+│   ├── write_benchmark.sh              # Write operation benchmark
+│   ├── run_benchmark_with_venv.sh      # Runner script with virtual env
+│   ├── run_locust_benchmark.sh         # Script to run locust benchmarks
+│   ├── run-benchmarks.sh               # General benchmark runner
+│   ├── setup_benchmark_env.sh          # Environment setup for benchmarks
+│   └── benchmark_results/              # Directory for benchmark results
+│
 ├── docker/                    # Docker-related files
 │   ├── Dockerfile             # Main Dockerfile for PostgreSQL nodes
 │   └── Dockerfile.loadbalancer # Dockerfile for HAProxy load balancer
@@ -62,3 +72,25 @@ To run the cluster:
 ```
 
 This will start all the components defined in the docker-compose.yml file.
+
+## Benchmarking
+
+The project includes several benchmark scripts to evaluate performance:
+
+```bash
+# Setup benchmark environment
+./benchmark/setup_benchmark_env.sh
+
+# Run specific benchmarks
+./benchmark/read_benchmark.sh
+./benchmark/write_benchmark.sh
+
+# Mixed workload (80% read, 20% write)
+READ_RATIO=80 WRITE_RATIO=20 ./mixed_benchmark.sh
+
+# Custom parameters
+USERS=200 SPAWN_RATE=20 RUN_TIME=120 ./benchmark/run_locust_benchmark.sh
+USERS=200 RUN_TIME=120 ./benchmark/read_benchmark.sh
+```
+
+Benchmark results are stored in the `benchmark/benchmark_results/` directory.
