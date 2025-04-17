@@ -46,9 +46,14 @@ max_wal_senders = 10
 max_replication_slots = 10
 EOF
 
-    # Configure pg_hba.conf with explicit replication permissions
-    echo "📝 Configuring pg_hba.conf for replication..."
-    cat > /var/lib/postgresql/data/pg_hba.conf << EOF
+    # Copy the pg_hba.conf file from the mounted location if it exists
+    if [ -f "/etc/postgresql/pg_hba.conf" ]; then
+        echo "📝 Copying pg_hba.conf from mounted location..."
+        cp /etc/postgresql/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf
+    else
+        # Configure pg_hba.conf with explicit replication permissions
+        echo "📝 Configuring pg_hba.conf for replication..."
+        cat > /var/lib/postgresql/data/pg_hba.conf << EOF
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
 # "local" is for Unix domain socket connections only
@@ -64,6 +69,7 @@ host    replication     all             ::0/0                   trust
 # Allow all connections from Docker network
 host    all             all             0.0.0.0/0               trust
 EOF
+    fi
 
     # Fix permissions on data directory
     echo "Setting ownership of data directory to postgres..."
@@ -74,12 +80,18 @@ EOF
 else
     echo "📝 PostgreSQL data directory already exists."
 
-    # Ensure replication is allowed in pg_hba.conf even if we didn't initialize
-    echo "📝 Updating pg_hba.conf to allow replication..."
-
-    # Check if replication entries already exist
-    if ! grep -q "host    replication     all             0.0.0.0/0" /var/lib/postgresql/data/pg_hba.conf; then
-        echo "host    replication     all             0.0.0.0/0               trust" >> /var/lib/postgresql/data/pg_hba.conf
+    # Check if pg_hba.conf from the mounted location needs to be applied
+    if [ -f "/etc/postgresql/pg_hba.conf" ]; then
+        echo "📝 Copying pg_hba.conf from mounted location..."
+        cp /etc/postgresql/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf
+        chown postgres:postgres /var/lib/postgresql/data/pg_hba.conf
+    else
+        # Ensure replication is allowed in pg_hba.conf even if we didn't initialize
+        echo "📝 Updating pg_hba.conf to allow replication..."
+        # Check if replication entries already exist
+        if ! grep -q "host    replication     all             0.0.0.0/0" /var/lib/postgresql/data/pg_hba.conf; then
+            echo "host    replication     all             0.0.0.0/0               trust" >> /var/lib/postgresql/data/pg_hba.conf
+        fi
     fi
 
     echo "📝 Reloading PostgreSQL configuration..."

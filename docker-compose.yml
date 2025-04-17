@@ -1,5 +1,6 @@
 services:
   loadbalancer:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile.loadbalancer
@@ -18,6 +19,7 @@ services:
     restart: unless-stopped
 
   coordinator_primary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -32,6 +34,7 @@ services:
     volumes:
       - citus_primary_data:/var/lib/postgresql/data
       - ./scripts/coordinator/primary-entrypoint.sh:/docker-entrypoint-initdb.d/primary-entrypoint.sh
+      - ./config/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
     networks:
       - citus_network
     healthcheck:
@@ -43,6 +46,7 @@ services:
     restart: unless-stopped
 
   coordinator_secondary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -57,6 +61,7 @@ services:
     volumes:
       - citus_secondary_data:/var/lib/postgresql/data
       - ./scripts/coordinator/secondary-entrypoint.sh:/docker-entrypoint-initdb.d/secondary-entrypoint.sh
+      - ./config/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
     depends_on:
       coordinator_primary:
         condition: service_healthy
@@ -70,6 +75,7 @@ services:
     restart: unless-stopped
 
   worker1_primary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -82,6 +88,7 @@ services:
     volumes:
       - worker1_primary_data:/var/lib/postgresql/data
       - ./scripts/worker/worker-primary-entrypoint.sh:/docker-entrypoint-initdb.d/worker-primary-entrypoint.sh
+      - ./config/postgres/worker-pg_hba.conf:/etc/postgresql/pg_hba.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U citus"]
       interval: 10s
@@ -92,6 +99,7 @@ services:
       - citus_network
 
   worker1_secondary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -105,6 +113,7 @@ services:
     volumes:
       - ./scripts/worker/worker-standby-entrypoint.sh:/docker-entrypoint-initdb.d/worker-standby-entrypoint.sh
       - worker1_secondary_data:/var/lib/postgresql/data
+      - ./config/postgres/worker-pg_hba.conf:/etc/postgresql/pg_hba.conf
     depends_on:
       worker1_primary:
         condition: service_healthy
@@ -118,6 +127,7 @@ services:
       - citus_network
 
   worker2_primary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -130,6 +140,7 @@ services:
     volumes:
       - worker2_primary_data:/var/lib/postgresql/data
       - ./scripts/worker/worker-primary-entrypoint.sh:/docker-entrypoint-initdb.d/worker-primary-entrypoint.sh
+      - ./config/postgres/worker-pg_hba.conf:/etc/postgresql/pg_hba.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U citus"]
       interval: 10s
@@ -140,6 +151,7 @@ services:
       - citus_network
 
   worker2_secondary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -153,6 +165,7 @@ services:
     volumes:
       - ./scripts/worker/worker-standby-entrypoint.sh:/docker-entrypoint-initdb.d/worker-standby-entrypoint.sh
       - worker2_secondary_data:/var/lib/postgresql/data
+      - ./config/postgres/worker-pg_hba.conf:/etc/postgresql/pg_hba.conf
     depends_on:
       worker2_primary:
         condition: service_healthy
@@ -166,6 +179,7 @@ services:
       - citus_network
 
   worker3_primary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -178,6 +192,7 @@ services:
     volumes:
       - worker3_primary_data:/var/lib/postgresql/data
       - ./scripts/worker/worker-primary-entrypoint.sh:/docker-entrypoint-initdb.d/worker-primary-entrypoint.sh
+      - ./config/postgres/worker-pg_hba.conf:/etc/postgresql/pg_hba.conf
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U citus"]
       interval: 10s
@@ -188,6 +203,7 @@ services:
       - citus_network
 
   worker3_secondary:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -201,6 +217,7 @@ services:
     volumes:
       - ./scripts/worker/worker-standby-entrypoint.sh:/docker-entrypoint-initdb.d/worker-standby-entrypoint.sh
       - worker3_secondary_data:/var/lib/postgresql/data
+      - ./config/postgres/worker-pg_hba.conf:/etc/postgresql/pg_hba.conf
     depends_on:
       worker3_primary:
         condition: service_healthy
@@ -214,6 +231,7 @@ services:
       - citus_network
 
   worker_monitor:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile
@@ -234,6 +252,7 @@ services:
     restart: unless-stopped
 
   manager:
+    platform: linux/amd64
     build:
       context: ./docker
       dockerfile: Dockerfile

@@ -144,7 +144,11 @@ fi
 
 # Explicitly configure pg_hba.conf for trust authentication method
 echo "📝 Configuring pg_hba.conf..."
-cat > /var/lib/postgresql/data/pg_hba.conf << EOF
+if [ -f "/etc/postgresql/pg_hba.conf" ]; then
+    echo "📝 Copying pg_hba.conf from mounted location..."
+    cp /etc/postgresql/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf
+else
+    cat > /var/lib/postgresql/data/pg_hba.conf << EOF
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
 # Allow all connections with trust authentication
@@ -152,6 +156,7 @@ local   all             all                                     trust
 host    all             all             0.0.0.0/0               trust
 host    replication     all             0.0.0.0/0               trust
 EOF
+fi
 
 # Fix permissions on data directory
 echo "🔧 Fixing permissions on data directory..."
