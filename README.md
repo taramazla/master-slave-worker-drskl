@@ -11,6 +11,9 @@ This project builds a distributed PostgreSQL cluster with:
 - **Load Balancer**: HAProxy for routing database connections
 - **Monitoring**: Worker node monitoring and automatic failover
 - **PostGIS Integration**: Spatial data capabilities on all nodes
+- **Benchmarking Tools**: Locust-based tools for performance testing
+
+![Architecture Diagram](docs/master-slave-worker.png)
 
 ## Project Structure
 
