@@ -100,9 +100,9 @@ for i in "${!STAGES[@]}"; do
   sleep $DURATION
   # At the end of the stage, stop worker1 for FAILOVER_DURATION seconds
   echo "[Failover] Stage $STAGE_NUM complete. Stopping worker1 for $FAILOVER_DURATION seconds."
-  docker stop citus_worker1
+  docker stop citus_worker1_primary
   sleep $FAILOVER_DURATION
-  docker start citus_worker1
+  docker start citus_worker1_primary
   echo "[Failover] worker1 restarted after failover at end of stage $STAGE_NUM."
   # If last stage, just finish
   if [ $((i+1)) -eq ${#STAGES[@]} ]; then
